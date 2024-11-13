@@ -1,0 +1,42 @@
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import datasets, layers, models
+import matplotlib.pyplot as plt
+
+(train_images, train_labels), (test_images, test_labels) = datasets.mnist.load_data()
+train_images = train_images.reshape((train_images.shape[0], 28, 28, 1)).astype('float32') / 255
+test_images = test_images.reshape((test_images.shape[0], 28, 28, 1)).astype('float32') / 255
+
+train_images = tf.image.resize(train_images, [32, 32])
+test_images = tf.image.resize(test_images, [32, 32])
+train_images = tf.image.grayscale_to_rgb(train_images)
+test_images = tf.image.grayscale_to_rgb(test_images)
+
+base_model = keras.applications.ResNet50(
+    weights=None,  
+    input_shape=(32, 32, 3),  
+    classes=10
+)
+
+base_model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+history = base_model.fit(train_images, train_labels, epochs=3, validation_data=(test_images, test_labels))
+
+test_loss, test_acc = base_model.evaluate(test_images, test_labels)
+print(f'Test accuracy: {test_acc}')
+
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper left')
+plt.show()
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper left')
+plt.show()
