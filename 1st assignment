@@ -61,3 +61,22 @@ for x_input in test_inputs:
     output = xor_predict(x_input)
     print(f"xor({x_input[0]}, {x_input[1]}) = {output}")
 
+#1b)
+import numpy as np
+import tensorflow as tf
+
+x_data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=np.float32)
+y_data = np.array([[0], [1], [1], [0]], dtype=np.float32)
+
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(2, input_dim=2, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+model.fit(x_data, y_data, epochs=1000, verbose=0)
+
+for x_input in x_data:
+    output = model.predict(np.array([x_input]))
+    print(f"xor({int(x_input[0])}, {int(x_input[1])}) = {round(output[0][0])}")
